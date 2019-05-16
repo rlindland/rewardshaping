@@ -153,7 +153,7 @@ def qLearning(env, num_episodes, discount_factor = 1.0,
             best_next_action = np.argmax(Q2[next_state])     
             td_target = reward[1] + discount_factor * Q2[next_state][best_next_action] 
             td_delta = td_target - Q2[state][action2] 
-            Q1[state][action2] += alpha * td_delta  
+            Q2[state][action2] += alpha * td_delta  
             # done is True if episode terminated    
             if done: 
                 break
