@@ -1,6 +1,7 @@
 """
 Iterated Prisoner's dilemma environment.
 """
+#pip install gym==0.10.3
 import gym
 import numpy as np
 import itertools 
