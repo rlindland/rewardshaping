@@ -104,9 +104,18 @@ def qLearning(env, num_episodes, discount_factor = 1.0,
     #Q1 = {}
     #Q1[]
 
-    Q1 = defaultdict(lambda: np.zeros(2)) 
-    Q2 = defaultdict(lambda: np.zeros(2)) 
-   
+    Q1 = {}
+    Q1[0]=[198./19.,220./19.]
+    Q1[1]=[144./19., 160./19.]
+    Q1[2]=[144./19., 160./19.]
+    Q1[3]=[198./19., 220./19.]
+    Q1[4]=[0.,0.]
+
+    #Q2=defaultdict(lambda: np.zeros(2))
+    Q2 = {}
+    for i in range(5):
+        Q2[i]=[0.,0.]
+
     # Keeps track of useful statistics 
     stats1 = plotting.EpisodeStats( 
         episode_lengths = np.zeros(num_episodes), 
@@ -172,8 +181,15 @@ def qLearning(env, num_episodes, discount_factor = 1.0,
 
 
 
-Q1, Q2, stats1, stats2 = qLearning(env, 100) 
-print(Q1)
-print(Q2)
-print(stats1)
-print(stats2)
+Q1, Q2, stats1, stats2 = qLearning(env, 10) 
+#print(Q1)
+#print(Q2)
+#print(stats1)
+#print(stats2)
+np.save("Q1.npy", Q1)
+np.save("Q2.npy", Q2)
+np.save("stats1.npy", stats1)
+np.save("stats2.npy", stats2)
+plotting.plot_episode_stats(stats1)
+plotting.plot_episode_stats(stats2)
+
