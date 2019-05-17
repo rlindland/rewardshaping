@@ -6,6 +6,7 @@ import numpy as np
 import itertools 
 import matplotlib 
 import matplotlib.style 
+from matplotlib import pyplot as plt
 import pandas as pd 
 import sys 
   
@@ -37,7 +38,7 @@ class IteratedPrisonersDilemma(gym.Env):
         ###   C        D   
         ### C -1, -1   -3, 0
         ### D 0 -3     -2, -2 
-        self.payout_mat = np.array([[-1., -3.], [0., -2.]])
+        self.payout_mat = np.array([[3., 0.], [4., 1.]])
         self.action_space = \
             Tuple([Discrete(self.NUM_ACTIONS), Discrete(self.NUM_ACTIONS)])
         self.observation_space = \
@@ -66,7 +67,7 @@ class IteratedPrisonersDilemma(gym.Env):
         done = (self.step_count == self.max_steps)
         return observations, rewards, done
 
-env = IteratedPrisonersDilemma(10000)
+env = IteratedPrisonersDilemma(100000)
 
 def createEpsilonGreedyPolicy(Q, epsilon, num_actions): 
     """ 
@@ -89,8 +90,8 @@ def createEpsilonGreedyPolicy(Q, epsilon, num_actions):
    
     return policyFunction 
 
-def qLearning(env, num_episodes, discount_factor = 1.0, 
-                            alpha = 0.6, epsilon = 0.1): 
+def qLearning(env, num_episodes, discount_factor = 0.9, 
+                            alpha1 = 0.01, alpha2 = 0.02, epsilon = 0.1): 
     """ 
     Q-Learning algorithm: Off-policy TD control. 
     Finds the optimal greedy policy while improving 
@@ -105,7 +106,9 @@ def qLearning(env, num_episodes, discount_factor = 1.0,
     #Q1[]
 
     Q1 = {}
-    Q1[0]=[198./19.,220./19.]
+    for i in range(5):
+        Q1[i]=[0.,0.]
+    Q1[0]=[198./19., 220./19.]
     Q1[1]=[144./19., 160./19.]
     Q1[2]=[144./19., 160./19.]
     Q1[3]=[198./19., 220./19.]
@@ -117,12 +120,8 @@ def qLearning(env, num_episodes, discount_factor = 1.0,
         Q2[i]=[0.,0.]
 
     # Keeps track of useful statistics 
-    stats1 = plotting.EpisodeStats( 
-        episode_lengths = np.zeros(num_episodes), 
-        episode_rewards = np.zeros(num_episodes))
-    stats2 = plotting.EpisodeStats( 
-        episode_lengths = np.zeros(num_episodes), 
-        episode_rewards = np.zeros(num_episodes))     
+    stats1 = []
+    stats2 = []  
        
     # Create an epsilon greedy policy function 
     # appropriately for environment action space 
@@ -130,7 +129,7 @@ def qLearning(env, num_episodes, discount_factor = 1.0,
     policy2 = createEpsilonGreedyPolicy(Q2, epsilon, 2) 
        
     # For every episode 
-    for ith_episode in range(num_episodes): 
+    for ith_episode in range(1): 
            
         # Reset the environment and pick the first action 
         state = env.reset()[0]
@@ -155,27 +154,30 @@ def qLearning(env, num_episodes, discount_factor = 1.0,
             next_state, reward, done = env.step([action1, action2]) 
             next_state = next_state[0]
             # Update statistics 
-            stats1.episode_rewards[ith_episode] += reward[0]
-            stats1.episode_lengths[ith_episode] = t 
-
-            stats2.episode_rewards[ith_episode] += reward[1]
-            stats2.episode_lengths[ith_episode] = t 
+            stats1.append(reward[0])
+            stats2.append(reward[1])
                
             # TD Update 
             best_next_action = np.argmax(Q1[next_state])     
             td_target = reward[0] + discount_factor * Q1[next_state][best_next_action] 
             td_delta = td_target - Q1[state][action1] 
-            Q1[state][action1] += alpha * td_delta
+            Q1[state][action1] += alpha1 * td_delta
 
             best_next_action = np.argmax(Q2[next_state])     
             td_target = reward[1] + discount_factor * Q2[next_state][best_next_action] 
             td_delta = td_target - Q2[state][action2] 
-            Q2[state][action2] += alpha * td_delta  
+            Q2[state][action2] += alpha2 * td_delta  
             # done is True if episode terminated    
             if done: 
                 break
                    
-            state = next_state 
+            state = next_state
+
+    stats1 = np.array(stats1)
+    stats2 = np.array(stats2)
+
+    stats1 = np.convolve(stats1,np.ones(5000,dtype=float),'valid') / 5000
+    stats2 = np.convolve(stats2,np.ones(5000,dtype=float),'valid') / 5000
        
     return Q1, Q2, stats1, stats2 
 
@@ -190,6 +192,9 @@ np.save("Q1.npy", Q1)
 np.save("Q2.npy", Q2)
 np.save("stats1.npy", stats1)
 np.save("stats2.npy", stats2)
-plotting.plot_episode_stats(stats1)
-plotting.plot_episode_stats(stats2)
+
+plt.figure(1)
+plt.plot(stats1[:100000], 'ro', markersize=3)
+plt.plot(stats2[:100000], 'bo', markersize=3)
+plt.show()
 
