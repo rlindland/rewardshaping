@@ -3,13 +3,17 @@ import numpy as np
 wow = []
 strat = []
 
-#Chicken - [0,-1,1,5]
+#Chicken - [5,4,6,0]
+#row_rewards = [0,-1,1,-5]
 #Battle of the Sexes - [3,0,0,2]
-row_rewards = [3,0,4,1]
+row_rewards = [3,0,0,2]
+#row_rewards = [3,0,4,1]
 
-#Chicken - [0,1,-1,5]
+#Chicken - [5,6,4,0]
+#col_rewards = [0,1,-1,-5]
 #Battle of the Sexes - [2,0,0,3]
-col_rewards = [3,4,0,1]
+col_rewards = [2,0,0,3]
+#col_rewards = [3,4,0,1]
 for ii in range(16):
 	strat2 = [ii%2, ii//2%2, ii//2//2%2, ii//2//2//2%2]
 	vars = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
