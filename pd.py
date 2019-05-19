@@ -38,8 +38,8 @@ class IteratedPrisonersDilemma(gym.Env):
         ###   C        D   
         ### C -1, -1   -3, 0
         ### D 0 -3     -2, -2 
-        self.payout_mat1 = np.array([[5., 4.], [6., 0.]])
-        self.payout_mat2 = np.array([[5., 4.], [6., 0.]])
+        self.payout_mat1 = np.array([[3., 0.], [0., 2.]])
+        self.payout_mat2 = np.array([[2., 0.], [0., 3.]])
         self.action_space = \
             Tuple([Discrete(self.NUM_ACTIONS), Discrete(self.NUM_ACTIONS)])
         self.observation_space = \
@@ -116,10 +116,15 @@ def qLearning(env, num_episodes, discount_factor = 0.9,
     # Q1[3]=[30., 28.]
     # Q1[4]=[0.,0.]
 
-    # Q1[0]=[50., 46.5]
-    # Q1[1]=[44.5, 45.0]
-    # Q1[2]=[50., 46.5]
-    # Q1[3]=[44.5, 45.0]
+    Q1[0]=[22.26315, 24.7368]
+    Q1[1]=[22.26315, 24.7368]
+    Q1[2]=[22.26315, 24.7368]
+    Q1[3]=[25.26315, 22.26315]
+
+    # Q1[0]=[18.9, 20.]
+    # Q1[1]=[21., 18.9]
+    # Q1[2]=[21., 18.9]
+    # Q1[3]=[18.9, 20.]
 
     #Q2=defaultdict(lambda: np.zeros(2))
     Q2 = {}
@@ -203,11 +208,13 @@ np.save("Q1.npy", Q1)
 np.save("Q2.npy", Q2)
 np.save("stats1.npy", stats1)
 np.save("stats2.npy", stats2)
+print(sum(stats1[:39000][-10000:]/10000))
+print(sum(stats2[:39000][-10000:]/10000))
 plt.figure(1)
-plt.ylim(0, 6)
-plt.plot(stats1[:40000], 'ro', markersize=1, label = "Q")
+plt.ylim(0, 3)
+plt.plot(stats1[:40000], 'ro', markersize=1, label = "Q+")
 plt.plot(stats2[:40000], 'bo', markersize=1, label = "Q")
-plt.title("Q vs Q Iterated Chicken")
+plt.title("Q+ vs Q Battle of the Sexes")
 plt.xlabel("Iterations")
 plt.ylabel("Rewards")
 plt.legend()
